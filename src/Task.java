@@ -1,13 +1,19 @@
 public class Task {
-    protected final int id;
+    private int id;
     protected final String title;
     protected Priority priority;
-    protected boolean completed;
 
-    public Task(int id, String title, Priority priority) {
-        this.id = id;
+    public Task(String title, Priority priority) {
         this.title = title;
         this.priority = priority;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getDetails() {

@@ -1,8 +1,8 @@
 class WorkTask extends Task {
     private final String project;
 
-    public WorkTask(int id, String title, Priority priority, String project) {
-        super(id, title, priority);
+    public WorkTask(String title, Priority priority, String project) {
+        super(title, priority);
         this.project = project;
     }
 

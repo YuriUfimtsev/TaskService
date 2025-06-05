@@ -2,14 +2,14 @@ import java.io.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 class TaskManager {
-    private final Map<Integer, Task> tasks;
-    private int nextId = 1;
-
+    private final ConcurrentHashMap<Integer, Task> tasks;
+    private final AtomicInteger nextId = new AtomicInteger(1);
     private static final Logger logger = Logger.getLogger(TaskManager.class.getName());
 
     public TaskManager() {
@@ -20,23 +20,25 @@ class TaskManager {
             throws IOException, ClassNotFoundException {
         try (var inputStream = new ObjectInputStream(
                 new FileInputStream(dataFilePath))) {
-            this.tasks = (Map<Integer, Task>) inputStream.readObject();
+            this.tasks = (ConcurrentHashMap<Integer, Task>) inputStream.readObject();
         }
     }
 
     public void addTask(Task task) throws IllegalArgumentException {
-        if (task.title.isBlank()) {
-            logger.warning("Ошибка добавления: заголовок не может быть пустым");
-            throw new IllegalArgumentException("Заголовок не может быть пустым");
+        if (task.title == null || task.title.isBlank()) {
+            logger.warning("Попытка добавить задачу с пустым заголовком");
+            throw new IllegalArgumentException("Заголовок задачи не может быть пустым");
         }
 
-        tasks.put(nextId++, task);
-        logger.info("Добавлена задача: " + task.title);
+        int id = nextId.getAndIncrement();
+        task.setId(id);
+        tasks.put(id, task);
+        logger.info("Добавлена задача #" + id + ": " + task.title);
     }
 
-    public List<Task> getTasksByPriority(Priority priority) {
+    public List<Task> getTasksByPriority(Priority neededPriority) {
         return tasks.values().stream()
-                .filter(task -> task.priority == priority)
+                .filter(task -> task.priority == neededPriority)
                 .collect(Collectors.toList());
     }
 
@@ -50,6 +52,15 @@ class TaskManager {
 
     public void processTasks(Consumer<Task> processor) {
         tasks.values().forEach(processor);
+    }
+
+    public boolean removeTask(int id) {
+        var removedTask = tasks.remove(id);
+        if (removedTask != null) {
+            logger.info("Удалена задача #" + id + ": " + removedTask.title);
+            return true;
+        }
+        return false;
     }
 
     public List<Task> searchTasks(String keyword) {

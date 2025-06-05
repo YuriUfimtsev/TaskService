@@ -9,13 +9,14 @@ public class Main {
         notifier.startMonitoring(manager);
 
         // Добавляем задачи
-        manager.addTask(new WorkTask(1, "Завершить проект", Priority.HIGH, "веб-сервис на Java"));
-        manager.addTask(new PersonalTask(2, "Работа по дому", Priority.MEDIUM, LocalDate.now().plusDays(1)));
+        manager.addTask(new WorkTask("Завершить проект", Priority.HIGH, "веб-сервис на Java"));
+        manager.addTask(new PersonalTask("Подготовить портфолио", Priority.MEDIUM, LocalDate.now().plusDays(1)));
+        manager.addTask(new PersonalTask("Работы по дому", Priority.MEDIUM, LocalDate.now().plusDays(1)));
 
         // Выводим в консоль список задач
         System.out.println("=== Все задачи ===");
         manager.processTasks(task ->
-                System.out.println("• " + task.getDetails())
+                System.out.println("• #" + task.getId() + " " + task.getDetails())
         );
 
         // Выводим в консоль статистику в формате количества задач по приоритетам
@@ -24,7 +25,11 @@ public class Main {
                 System.out.println(p + ": " + count + " задач")
         );
 
-        // Через некоторое время получим уведомления
+        // Пример удаления задачи
+        var firstTaskId = manager.getTasksByPriority(Priority.HIGH).getFirst().getId();
+        manager.removeTask(firstTaskId);
+
+        // Наблюдаем за уведомлениями
         Thread.sleep(30000);
         notifier.stop();
     }

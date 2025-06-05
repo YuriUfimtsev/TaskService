@@ -3,8 +3,8 @@ import java.time.LocalDate;
 class PersonalTask extends Task {
     private final LocalDate dueDate;
 
-    public PersonalTask(int id, String title, Priority priority, LocalDate dueDate) {
-        super(id, title, priority);
+    public PersonalTask(String title, Priority priority, LocalDate dueDate) {
+        super(title, priority);
         this.dueDate = dueDate;
     }
 
