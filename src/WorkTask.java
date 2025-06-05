@@ -1,3 +1,6 @@
+import lombok.Getter;
+
+@Getter
 class WorkTask extends Task {
     private final String project;
 

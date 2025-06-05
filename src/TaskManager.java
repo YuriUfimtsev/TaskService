@@ -16,11 +16,23 @@ class TaskManager {
         this.tasks = new ConcurrentHashMap<>();
     }
 
-    public TaskManager(String dataFilePath)
-            throws IOException, ClassNotFoundException {
-        try (var inputStream = new ObjectInputStream(
-                new FileInputStream(dataFilePath))) {
-            this.tasks = (ConcurrentHashMap<Integer, Task>) inputStream.readObject();
+    public TaskManager(String dataFilePath) throws IOException, ClassNotFoundException {
+        try (var inputStream = new ObjectInputStream(new FileInputStream(dataFilePath))) {
+            var fileObjects = inputStream.readObject();
+            if (fileObjects instanceof ConcurrentHashMap<?, ?> rawMap) {
+                var hasInvalidTypes = rawMap.entrySet().stream()
+                        .limit(5)
+                        .anyMatch(entry ->
+                                !(entry.getKey() instanceof Integer) ||
+                                        !(entry.getValue() instanceof Task)
+                        );
+                if (hasInvalidTypes) {
+                    throw new InvalidObjectException("Некорректная структура файла");
+                }
+                this.tasks = (ConcurrentHashMap<Integer, Task>) fileObjects;
+            } else {
+                throw new InvalidObjectException("Некорректная структура файла");
+            }
         }
     }
 

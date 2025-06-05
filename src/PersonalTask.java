@@ -1,5 +1,8 @@
+import lombok.Getter;
+
 import java.time.LocalDate;
 
+@Getter
 class PersonalTask extends Task {
     private final LocalDate dueDate;
 
