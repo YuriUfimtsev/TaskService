@@ -107,6 +107,11 @@ class TaskManager {
         return false;
     }
 
+    /**
+     * Выполняет поиск задач по ключевому слову
+     * @param keyword ключевое слово, по которому выполняется поиск
+     * @return список задач, заголовки которых содержат указанное ключевое слово
+     */
     public List<Task> searchTasks(String keyword) {
         final var pattern = ".*" + keyword.toLowerCase() + ".*";
         return tasks.values().stream()
